@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="${1:-0.1.0}"
+VERSION="${1:-0.2.0-dev}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BIN="$ROOT/build/fredminer"
 DIST="$ROOT/dist"
@@ -11,10 +11,7 @@ DEST="$STAGE/fredminer"
 trap 'rm -rf "$STAGE"' EXIT
 
 if [[ ! -x "$BIN" ]]; then
-    echo "ERROR: $BIN not found."
-    echo "Build first:"
-    echo "  cmake -S . -B build -DCMAKE_BUILD_TYPE=Release"
-    echo "  cmake --build build -j\$(nproc)"
+    echo "Build FredMiner first."
     exit 1
 fi
 
@@ -28,14 +25,8 @@ cp "$ROOT/hiveos/h-stats.sh" "$DEST/"
 
 chmod +x "$DEST/fredminer" "$DEST"/h-*.sh
 
-# Stamp package version.
-sed -i "s/CUSTOM_VERSION=\"[^\"]*\"/CUSTOM_VERSION=\"$VERSION\"/" "$DEST/h-manifest.conf"
-
 TARBALL="$DIST/fredminer-$VERSION.tar.gz"
 tar -czf "$TARBALL" -C "$STAGE" fredminer
 
-echo "Created: $TARBALL"
-echo
-tar -tzf "$TARBALL"
-echo
+echo "Created $TARBALL"
 sha256sum "$TARBALL"

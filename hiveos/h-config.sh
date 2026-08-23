@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-# HiveOS sources this file and provides CUSTOM_* variables.
-
 miner_ver() {
-    echo "0.1.0"
+    echo "0.2.0-dev"
 }
 
 miner_config_echo() {
@@ -15,7 +13,7 @@ miner_config_gen() {
     local cfg="/hive/miners/custom/fredminer/fredminer.conf"
 
     local algo="${CUSTOM_ALGO:-pearlhash}"
-    local pool="${CUSTOM_URL:-}"
+    local pool="${CUSTOM_URL:-prl-us.kryptex.network:7048}"
     local wallet="${CUSTOM_TEMPLATE:-}"
     local pass="${CUSTOM_PASS:-x}"
     local extra="${CUSTOM_USER_CONFIG:-}"

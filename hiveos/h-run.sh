@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -o pipefail
 
 MINER_DIR="/hive/miners/custom/fredminer"
@@ -10,7 +9,7 @@ LOG_FILE="$LOG_DIR/fredminer.log"
 mkdir -p "$LOG_DIR"
 
 if [[ ! -x "$MINER_DIR/fredminer" ]]; then
-    echo "FredMiner binary not found or not executable: $MINER_DIR/fredminer" | tee -a "$LOG_FILE"
+    echo "FredMiner binary not found: $MINER_DIR/fredminer" | tee -a "$LOG_FILE"
     exit 1
 fi
 
@@ -24,9 +23,6 @@ source "$CONF"
 
 cd "$MINER_DIR" || exit 1
 
-echo "Starting FredMiner..." | tee -a "$LOG_FILE"
-
-# CUSTOM_USER_CONFIG is intentionally appended at the end.
 # shellcheck disable=SC2086
 exec ./fredminer \
     --algo "${ALGO:-pearlhash}" \
