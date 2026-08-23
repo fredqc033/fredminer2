@@ -1,0 +1,63 @@
+name: Build FredMiner HiveOS
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout FredMiner
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake ninja-build
+
+      - name: Install CUDA Toolkit
+        uses: Jimver/cuda-toolkit@v0.2.24
+        with:
+          cuda: "12.8.1"
+          method: "network"
+
+      - name: Check CUDA
+        run: |
+          nvcc --version
+          cmake --version
+          g++ --version
+
+      - name: Configure FredMiner
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CUDA_ARCHITECTURES=120
+
+      - name: Compile FredMiner
+        run: |
+          cmake --build build -j2
+
+      - name: Create HiveOS package
+        run: |
+          mkdir -p package/fredminer
+
+          cp build/fredminer package/fredminer/
+          cp hiveos/h-manifest.conf package/fredminer/
+          cp hiveos/h-config.sh package/fredminer/
+          cp hiveos/h-run.sh package/fredminer/
+          cp hiveos/h-stats.sh package/fredminer/
+
+          chmod +x package/fredminer/fredminer
+          chmod +x package/fredminer/h-*.sh
+
+          tar -czf fredminer-hiveos.tar.gz -C package fredminer
+
+      - name: Upload HiveOS package
+        uses: actions/upload-artifact@v4
+        with:
+          name: fredminer-hiveos
+          path: fredminer-hiveos.tar.gz
